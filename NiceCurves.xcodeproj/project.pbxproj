@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1779F5AB173E94DC00BF8B42 /* star-white.png in Resources */ = {isa = PBXBuildFile; fileRef = 1779F5AA173E94DB00BF8B42 /* star-white.png */; };
 		BB598F6916E9AA9A00E2E523 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB598F6816E9AA9A00E2E523 /* QuartzCore.framework */; };
 		BB598F6B16E9AA9A00E2E523 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB598F6A16E9AA9A00E2E523 /* OpenGLES.framework */; };
 		BB598F6D16E9AA9A00E2E523 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB598F6C16E9AA9A00E2E523 /* OpenAL.framework */; };
@@ -141,12 +142,10 @@
 		BB63DEAA16E9D913009D72FF /* point2_red.png in Resources */ = {isa = PBXBuildFile; fileRef = BB63DEA616E9D913009D72FF /* point2_red.png */; };
 		BB63DEAB16E9D913009D72FF /* point3_orange.png in Resources */ = {isa = PBXBuildFile; fileRef = BB63DEA716E9D913009D72FF /* point3_orange.png */; };
 		BB63DEAC16E9D913009D72FF /* point4_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = BB63DEA816E9D913009D72FF /* point4_blue.png */; };
-		BBB393D016EB1DC5007D05EA /* star-blue.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB393CD16EB1DC5007D05EA /* star-blue.png */; };
-		BBB393D116EB1DC5007D05EA /* star-green.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB393CE16EB1DC5007D05EA /* star-green.png */; };
-		BBB393D216EB1DC5007D05EA /* star-red.png in Resources */ = {isa = PBXBuildFile; fileRef = BBB393CF16EB1DC5007D05EA /* star-red.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1779F5AA173E94DB00BF8B42 /* star-white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-white.png"; sourceTree = "<group>"; };
 		BB598F6516E9AA9A00E2E523 /* NiceCurves.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NiceCurves.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB598F6816E9AA9A00E2E523 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		BB598F6A16E9AA9A00E2E523 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -425,9 +424,6 @@
 		BB63DEA616E9D913009D72FF /* point2_red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = point2_red.png; sourceTree = "<group>"; };
 		BB63DEA716E9D913009D72FF /* point3_orange.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = point3_orange.png; sourceTree = "<group>"; };
 		BB63DEA816E9D913009D72FF /* point4_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = point4_blue.png; sourceTree = "<group>"; };
-		BBB393CD16EB1DC5007D05EA /* star-blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-blue.png"; sourceTree = "<group>"; };
-		BBB393CE16EB1DC5007D05EA /* star-green.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-green.png"; sourceTree = "<group>"; };
-		BBB393CF16EB1DC5007D05EA /* star-red.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "star-red.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -503,9 +499,7 @@
 		BB598F7B16E9AA9A00E2E523 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				BBB393CD16EB1DC5007D05EA /* star-blue.png */,
-				BBB393CE16EB1DC5007D05EA /* star-green.png */,
-				BBB393CF16EB1DC5007D05EA /* star-red.png */,
+				1779F5AA173E94DB00BF8B42 /* star-white.png */,
 				BB63DEA516E9D913009D72FF /* point1_green.png */,
 				BB63DEA616E9D913009D72FF /* point2_red.png */,
 				BB63DEA716E9D913009D72FF /* point3_orange.png */,
@@ -948,9 +942,7 @@
 				BB63DEAA16E9D913009D72FF /* point2_red.png in Resources */,
 				BB63DEAB16E9D913009D72FF /* point3_orange.png in Resources */,
 				BB63DEAC16E9D913009D72FF /* point4_blue.png in Resources */,
-				BBB393D016EB1DC5007D05EA /* star-blue.png in Resources */,
-				BBB393D116EB1DC5007D05EA /* star-green.png in Resources */,
-				BBB393D216EB1DC5007D05EA /* star-red.png in Resources */,
+				1779F5AB173E94DC00BF8B42 /* star-white.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -10,13 +10,17 @@
 // Import the interfaces
 #import "NiceCurvesLayer.h"
 
+@interface BezierCurve
+
+@end
+
+float movementDuration = 3.0;
+
 enum {
-	kTagstarGreenSprite = 1001,
-    kTagstarRedSprite = 1002,
-    kTagstarBlueSprite = 1003,
-	kTagstarGreenBezierAction,
-    kTagstarRedCatMullRomAction,
-    kTagstarBlueCardinalAction,
+	kTagstarQuadBezier = 1001,
+    kTagstarCubicBezier = 1002,
+    kTagstarCatmullRom = 1003,
+    kTagstarCardinal = 1004,
 	kTagControlPoint1Sprite,
 	kTagControlPoint1Label,
 	kTagControlPoint2Sprite,
@@ -31,6 +35,11 @@ NSString *const kControlPoint1Title = @"Control Point 1";
 NSString *const kControlPoint2Title = @"Control Point 2";
 NSString *const kControlPoint3Title = @"Control Point 3";
 NSString *const kcontrolPoint4Title = @"Control Point 4";
+
+ccColor3B colorQuadBezier;
+ccColor3B colorCubicBezier;
+ccColor3B colorCatmullRom;
+ccColor3B colorCardinal;
 
 @interface NiceCurvesLayer(Private)
 -(void)startSpriteMovement;
@@ -66,7 +75,11 @@ NSString *const kcontrolPoint4Title = @"Control Point 4";
 	// always call "super" init
 	// Apple recommends to re-assign "self" with the "super" return value
 	if( (self=[super init])) {
-		
+        colorQuadBezier = ccc3(0, 255, 0);
+        colorCubicBezier = ccc3(255, 255, 0);
+        colorCatmullRom = ccc3(255, 0, 255);
+        colorCardinal = ccc3(0, 255, 255);
+
 		// Setup touches
 		[[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:0 swallowsTouches:NO];
 		
@@ -74,19 +87,24 @@ NSString *const kcontrolPoint4Title = @"Control Point 4";
 		size = [[CCDirector sharedDirector] winSize];
 		
 		// Now lets add the green star sprite for the bezier
-		CCSprite *starGreenSprite = [CCSprite spriteWithFile:@"star-green.png"];
-		starGreenSprite.position = ccp(size.width/2, 10);
-		[self addChild:starGreenSprite z:3 tag:kTagstarGreenSprite];
-		
+		CCSprite *starQuadBezier = [CCSprite spriteWithFile:@"star-white.png"];
+        starQuadBezier.color = colorQuadBezier;
+		[self addChild:starQuadBezier z:3 tag:kTagstarQuadBezier];
+
 		// And lets add the red star sprite for the catmullrom
-		CCSprite *starRedSprite = [CCSprite spriteWithFile:@"star-red.png"];
-		starRedSprite.position = ccp(size.width/2, 10);
-		[self addChild:starRedSprite z:3 tag:kTagstarRedSprite];
+		CCSprite *startCubicBezier = [CCSprite spriteWithFile:@"star-white.png"];
+        startCubicBezier.color = colorCubicBezier;
+		[self addChild:startCubicBezier z:3 tag:kTagstarCubicBezier];
+
+		// And lets add the red star sprite for the catmullrom
+		CCSprite *startCatmullRom = [CCSprite spriteWithFile:@"star-white.png"];
+        startCatmullRom.color = colorCatmullRom;
+		[self addChild:startCatmullRom z:3 tag:kTagstarCatmullRom];
 
         // And lets add the blue star sprite for the cardinal spline
-		CCSprite *starBlueSprite = [CCSprite spriteWithFile:@"star-blue.png"];
-		starBlueSprite.position = ccp(size.width/2, 10);
-		[self addChild:starBlueSprite z:3 tag:kTagstarBlueSprite];
+		CCSprite *starCardinal = [CCSprite spriteWithFile:@"star-white.png"];
+        starCardinal.color = colorCardinal;
+		[self addChild:starCardinal z:3 tag:kTagstarCardinal];
 
 		// Set not dragging
 		dragging = DraggingSpriteNone;
@@ -115,12 +133,15 @@ NSString *const kcontrolPoint4Title = @"Control Point 4";
 	[super dealloc];
 }
 
+-(NSString *)formatPoint:(CGPoint)point named:(NSString *)name
+{
+	return [NSString stringWithFormat:@"%@:(%.2f,%.2f)",name,point.x, point.y];
+}
+
+#pragma mark - Scene Management
+
 -(void)startSpriteMovement 
 {
-	CCSprite *starGreenSprite = (CCSprite *)[self getChildByTag:kTagstarGreenSprite];
-    CCSprite *starRedSprite = (CCSprite *)[self getChildByTag:kTagstarRedSprite];
-    CCSprite *starBlueSprite = (CCSprite *)[self getChildByTag:kTagstarBlueSprite];
-
 	// Setup default positions for control points for the bezier/catmullrom/cardinal
 	controlPoint1 = ccp(30, 100);
 	controlPoint2 = ccp(190, 255);
@@ -163,127 +184,185 @@ NSString *const kcontrolPoint4Title = @"Control Point 4";
 	controlPoint4Label.position = ccp(size.width / 2, size.height -30);
 	[self addChild:controlPoint4Label z:1 tag:kTagcontrolPoint4Label];
 	
-    CCLabelTTF *bezierLabel = [CCLabelTTF labelWithString:@"- Bezier -" fontName:fontName fontSize:fontSize+2];
-	bezierLabel.position = ccp(size.width / 2 - 100, 30);
-    bezierLabel.color = ccc3(0,255,0);
-	[self addChild:bezierLabel z:1];
+    CCLabelTTF *quadBezierLabel = [CCLabelTTF labelWithString:@"- Quad Bezier -" fontName:fontName fontSize:fontSize+2];
+	quadBezierLabel.position = ccp(size.width / 2 - 130, 30);
+    quadBezierLabel.color = colorQuadBezier;
+	[self addChild:quadBezierLabel z:1];
+
+    CCLabelTTF *cubicBezierLabel = [CCLabelTTF labelWithString:@"- Cubic Bezier -" fontName:fontName fontSize:fontSize+2];
+	cubicBezierLabel.position = ccp(size.width / 2 - 40, 30);
+    cubicBezierLabel.color = colorCubicBezier;
+	[self addChild:cubicBezierLabel z:1];
     
     CCLabelTTF *cmrLabel = [CCLabelTTF labelWithString:@"- Catmull-Rom spline -" fontName:fontName fontSize:fontSize+2];
-	cmrLabel.position = ccp(size.width / 2, 30);
+	cmrLabel.position = ccp(size.width / 2 + 65, 30);
     cmrLabel.color = ccc3(255,0,255);
 	[self addChild:cmrLabel z:1];
     
     CCLabelTTF *cardinalLabel = [CCLabelTTF labelWithString:@"- Cardinal spline -" fontName:fontName fontSize:fontSize+2];
-	cardinalLabel.position = ccp(size.width /2 +130, 30);
+	cardinalLabel.position = ccp(size.width /2 + 180, 30);
     cardinalLabel.color = ccc3(0, 255, 255);
     [self addChild:cardinalLabel z:1];
 
 	// Set starting position for the sprites
-	starGreenSprite.position = controlPoint1;
-    starRedSprite.position = controlPoint1;
-    starBlueSprite.position = controlPoint1;
+	[self getChildByTag:kTagstarQuadBezier].position = controlPoint1;
+	[self getChildByTag:kTagstarCubicBezier].position = controlPoint1;
+	[self getChildByTag:kTagstarCatmullRom].position = controlPoint1;
+	[self getChildByTag:kTagstarCardinal].position = controlPoint1;
 
 	// Perform the movement
 	[self performSpriteMovement];
 }
+
+#pragma mark - Moving objects along the curves
 
 -(void)performSpriteMovement
 {
-	// Get the sprite
-	CCSprite *starGreenSprite = (CCSprite *)[self getChildByTag:kTagstarGreenSprite];
-    CCSprite *starRedSprite = (CCSprite *)[self getChildByTag:kTagstarRedSprite];
-    CCSprite *starBlueSprite = (CCSprite *)[self getChildByTag:kTagstarBlueSprite];
+    [self moveQuadBezier];
+    [self moveCubicBezier];
+    [self moveCatmullRom];
+    [self moveCardinalSpline];
+    [self runAction:[CCSequence actionOne:[CCDelayTime actionWithDuration:movementDuration]
+                                      two:[CCCallBlock actionWithBlock:^{
+        [self performSpriteMovement];
+    }]]];
+}
 
-	// Setup the actions
+-(void) moveQuadBezier
+{
+	CCSprite *star = (CCSprite *)[self getChildByTag:kTagstarQuadBezier];
 	id bezierAction;
-    id catmullromAction;
-    id cardinalsplineAction;
-    id callback = [CCCallFunc actionWithTarget:self selector:@selector(curveFinished:)];
-    
-    // 1 - Setup the Bezier Curve
-	ccBezierConfig bezier;
+    // 1 - Setup the Quad Bezier Curve
+	ccBezierConfig bezierQuad;
     
 	// Create the bezier path
-    bezier.controlPoint_1 = controlPoint1;
-    bezier.controlPoint_2 = controlPoint2;
-    bezier.endPosition = controlPoint4;
+    bezierQuad.controlPoint_1 = controlPoint1;
+    bezierQuad.controlPoint_2 = controlPoint2;
+    bezierQuad.endPosition = controlPoint4;
 
-	// Creat the bezier action
-	bezierAction = [CCBezierTo actionWithDuration:3.0 bezier:bezier];
+	// Create the bezier action
+	bezierAction = [CCBezierTo actionWithDuration:movementDuration bezier:bezierQuad];
     
-    starGreenSprite.position = controlPoint1;
+    star.position = controlPoint1;
     
     // Run the action sequence for the Bezier curve
-	CCAction *arcAction = [CCSequence actions: bezierAction, callback, nil];
-	arcAction.tag = kTagstarGreenBezierAction;
-	[starGreenSprite runAction:arcAction];
+	[star runAction:bezierAction];
+}
 
-    // setup the PointArray for Catmulrom spline and Cardinal spline
-    CCPointArray* pointArray = [CCPointArray arrayWithCapacity:4];
+-(void) moveCubicBezier
+{
+	CCSprite *star = (CCSprite *)[self getChildByTag:kTagstarCubicBezier];
+	id bezierAction;
+    // 1 - Setup the Quad Bezier Curve
+	ccBezierConfig bezierQuad;
+    
+	// Create the bezier path
+    bezierQuad.controlPoint_1 = controlPoint2;
+    bezierQuad.controlPoint_2 = controlPoint3;
+    bezierQuad.endPosition = controlPoint4;
+
+	// Create the bezier action
+	bezierAction = [CCBezierTo actionWithDuration:movementDuration bezier:bezierQuad];
+    
+    star.position = controlPoint1;
+    
+    // Run the action sequence for the Bezier curve
+	[star runAction:bezierAction];
+}
+
+-(void) moveCatmullRom
+{
+    CCSprite *star = (CCSprite *)[self getChildByTag:kTagstarCatmullRom];
+
+	// Setup the actions
+    id catmullromAction;
+
+    CCPointArray *pointArray = [CCPointArray arrayWithCapacity:4];
     [pointArray addControlPoint:controlPoint1];
     [pointArray addControlPoint:controlPoint2];
     [pointArray addControlPoint:controlPoint3];
     [pointArray addControlPoint:controlPoint4];
     
-    catmullromAction = [CCCatmullRomTo actionWithDuration:3 points:pointArray];
+    catmullromAction = [CCCatmullRomTo actionWithDuration:movementDuration points:pointArray];
 
-    starRedSprite.position = controlPoint1;
+    star.position = controlPoint1;
     
-	// Run the action sequence for the Catmullrom Curve
 	CCAction *cmrAction = [CCSequence actions: catmullromAction, nil];
-	cmrAction.tag = kTagstarRedCatMullRomAction;
-	[starRedSprite runAction:cmrAction];
-    
-    // 3 - Setup the Cardinal spline
-    
-    cardinalsplineAction = [CCCardinalSplineTo actionWithDuration:2.5 points:pointArray tension:0.0f];
-    
-    starBlueSprite.position = controlPoint1;
-
-	// Run the action sequence for the Cardinal Spline Curve
-	CCAction *cardinalAction = [CCSequence actions: cardinalsplineAction, nil];
-	cardinalAction.tag = kTagstarBlueCardinalAction;
-	[starBlueSprite runAction:cardinalAction];
-    
+	[star runAction:cmrAction];
 }
 
--(void)curveFinished:(id)sender 
+-(void) moveCardinalSpline
 {
-	// Perform the movement
-	[self performSpriteMovement];
+    CCSprite *star = (CCSprite *)[self getChildByTag:kTagstarCardinal];
+
+    CCPointArray *pointArray = [CCPointArray arrayWithCapacity:4];
+    [pointArray addControlPoint:controlPoint1];
+    [pointArray addControlPoint:controlPoint2];
+    [pointArray addControlPoint:controlPoint3];
+    [pointArray addControlPoint:controlPoint4];
+    CCCardinalSplineTo *cardinalsplineAction = [CCCardinalSplineTo actionWithDuration:movementDuration points:pointArray tension:0.0f];
+    
+    star.position = controlPoint1;
+
+	CCAction *cardinalAction = [CCSequence actions: cardinalsplineAction, nil];
+	[star runAction:cardinalAction];
 }
+
+
+#pragma mark - Drawing the curves
 
 -(void) draw
-{	
+{
+    [self drawQuadBezier];
+    [self drawCubicBezier];
+    [self drawCatmullRom];
+    [self drawCardinalSpline];
+}
+
+-(void) drawQuadBezier
+{
 	// draw quad bezier path
-    ccDrawColor4B(0, 255, 0, 255);
+    ccDrawColor4B( colorQuadBezier.r, colorQuadBezier.g, colorQuadBezier.b, 255);
     glLineWidth(2.0f);
 	ccDrawQuadBezier(controlPoint1, controlPoint2, controlPoint4, 100);
-    
-    // setup the PointArray for Catmulrom spline and Cardinal spline
+}
+
+-(void) drawCubicBezier
+{
+    ccDrawColor4B( colorCubicBezier.r, colorCubicBezier.g, colorCubicBezier.b, 255);
+    glLineWidth(2.0f);
+	ccDrawCubicBezier(controlPoint1, controlPoint2, controlPoint3, controlPoint4, 100);
+}
+
+-(void) drawCatmullRom
+{
     CCPointArray* pointArray = [CCPointArray arrayWithCapacity:4];
     [pointArray addControlPoint:controlPoint1];
     [pointArray addControlPoint:controlPoint2];
     [pointArray addControlPoint:controlPoint3];
     [pointArray addControlPoint:controlPoint4];
     
-    ccDrawColor4B(255, 0, 255, 255);
+    ccDrawColor4B( colorCatmullRom.r, colorCatmullRom.g, colorCatmullRom.b, 255);
     glLineWidth(2.0f);
     ccDrawCatmullRom(pointArray, 100);
-    
-    // draw Cardinal spline
-    ccDrawColor4B(0, 255, 255, 255);
-    glLineWidth(2.0f);
-    ccDrawCardinalSpline(pointArray, 0.0f, 100);
-    
 }
 
--(NSString *)formatPoint:(CGPoint)point named:(NSString *)name
+-(void) drawCardinalSpline
 {
-	return [NSString stringWithFormat:@"%@:(%.2f,%.2f)",name,point.x, point.y];
+    CCPointArray* pointArray = [CCPointArray arrayWithCapacity:4];
+    [pointArray addControlPoint:controlPoint1];
+    [pointArray addControlPoint:controlPoint2];
+    [pointArray addControlPoint:controlPoint3];
+    [pointArray addControlPoint:controlPoint4];
+
+    ccDrawColor4B(colorCardinal.r, colorCardinal.g, colorCardinal.b, 255);
+
+    glLineWidth(2.0f);
+    ccDrawCardinalSpline(pointArray, 0.0f, 100);
 }
 
 #pragma mark - TouchHandler delegate methods
+
 - (BOOL)ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
 {        
 	// Check the touch locations
